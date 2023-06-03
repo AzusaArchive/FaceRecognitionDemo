@@ -139,6 +139,8 @@ class App:
         self.eventLoop = loop
         self.task_recognition: Optional[Task] = None
         self.task_updateNameBoard: Optional[Task] = None
+        self.exitFlag = False
+        self.window.protocol("WM_DELETE_WINDOW", self.ShutDown)
 
     def InitNameTable(self):
         self.nameTable = ttk.Treeview(self.nameBoard, columns=["#", "name", "status", "blink_times", "online_time"],
@@ -272,9 +274,17 @@ class App:
             .grid(column=0, padx=12, pady=(0, 24), sticky="nw")
 
     async def RunAsync(self):
-        while True:
+        while not self.exitFlag:
             self.window.update()
             await asyncio.sleep(0)  # 自动调度
+
+    def ShutDown(self):
+        if self.task_recognition is not None:
+            self.task_recognition.cancel()
+        if self.task_updateNameBoard is not None:
+            self.task_updateNameBoard.cancel()
+        self.exitFlag = True
+        self.window.destroy()
 
     def SelectVideo(self):
         self.videoPath = TkFileDiag.askopenfilename(filetypes=[("Video", ["mp4", "flv", "avi", "rmvb"])])

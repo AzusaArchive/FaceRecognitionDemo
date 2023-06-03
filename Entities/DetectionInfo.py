@@ -174,7 +174,7 @@ class DetectionInfo:
                 self.__status = Status.Offline
                 Log(f"{self.__userName} is offline")
             else:
-                self.__onlineTime += timedelta(seconds=waitTime) # FIXME 不精确计算，尝试用计时器取得精准时间
+                self.__onlineTime += timedelta(seconds=waitTime)  # FIXME 不精确计算，尝试用计时器取得精准时间
 
         async def onlineCheck():
             # 3秒内发现在线则等待3秒
