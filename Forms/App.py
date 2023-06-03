@@ -57,7 +57,7 @@ class App:
         self.mouseOpenedThresholdVar = tk.DoubleVar(value=0.5)
         self.expressionCheckFrequencyVar = tk.IntVar(value=30)
         self.asleepTimeThresholdVar = tk.DoubleVar(value=60)
-        self.headDownAngleThresholdVar = tk.IntVar(value=10)
+        self.headDownAngleThresholdVar = tk.IntVar(value=5)
 
         self.controlPanelWrapper: tk.Canvas = tk.Canvas(self.window, bg="#1E1E1E", relief=tk.RIDGE, bd=1,
                                                         highlightthickness=0)
@@ -264,12 +264,12 @@ class App:
 
         slider_headDownAngleThreshold = tk.Scale(controlPanel, bg="#1E1E1E", fg="#DDDDDD",
                                                  label="低头判定阈值（度）：", orient=tk.HORIZONTAL, relief=tk.FLAT,
-                                                 bd=1, from_=5, to=30, resolution=1,
+                                                 bd=1, from_=1, to=30, resolution=1,
                                                  highlightthickness=0, sliderrelief=tk.FLAT, troughcolor="gray",
                                                  activebackground="#323233", width="6", sliderlength="20", length=270,
                                                  variable=self.headDownAngleThresholdVar)
         slider_headDownAngleThreshold.grid(column=0, padx=12, pady=5, sticky="nw")
-        tk.Label(controlPanel, text="对象头部俯仰角超出该值时判定为低头状态（默认：10）", bg="#1E1E1E",
+        tk.Label(controlPanel, text="对象头部俯仰角超出该值时判定为低头状态（默认：5）", bg="#1E1E1E",
                  fg="#DDDDDD") \
             .grid(column=0, padx=12, pady=(0, 24), sticky="nw")
 

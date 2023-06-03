@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import tkinter as tk
 import tkinter.messagebox
+import traceback
 from typing import Optional
 
 from numpy import ndarray
@@ -36,24 +37,32 @@ class FaceInputPage:
         self.btn_confirm.grid(row=0, column=0, sticky="NSEW")
 
         self.task = loop.create_task(self.StartRecord())
+        self.currentFrame = None
 
     async def StartRecord(self):
-        with await Frame.FromCamera() as self.frameCapture:
-            while True:
-                ret, frame = self.frameCapture.GetFrame()
-                if not ret:
-                    raise "无法连接到摄像头"
-                if frame is not None:
-                    result = FaceRec.Recognize(frame, list(FaceData.faceData.keys()), list(FaceData.faceData.values()))
-                    for name, location in result:
-                        FaceRec.DrawFaceRect(frame, location)
-                    tkImg = Frame.BGRArray2TkImg(frame)
-                    self.display.config(image=tkImg)
-                    self.display.image = tkImg
-                await asyncio.sleep(0.033)
+        try:
+            with await Frame.FromCamera() as self.frameCapture:
+                while True:
+                    ret, frame = self.frameCapture.GetFrame()
+                    if not ret:
+                        raise "无法连接到摄像头"
+                    if frame is not None:
+                        self.currentFrame = frame
+                        result = FaceRec.Recognize(frame, list(FaceData.faceData.keys()), list(FaceData.faceData.values()))
+                        for name, location in result:
+                            FaceRec.DrawFaceRect(frame, location)
+                        tkImg = Frame.BGRArray2TkImg(frame)
+                        self.display.config(image=tkImg)
+                        self.display.image = tkImg
+                    await asyncio.sleep(0.033)
+        except Exception:
+            traceback.print_exc()
+            raise
 
     def ConfirmFaceData(self):
-        encodings = FaceRec.EncodeFaces(self.frameCapture.GetFrame())
+        if self.currentFrame is None:
+            return
+        encodings = FaceRec.EncodeFaces(self.currentFrame)
         if tk.messagebox.askyesno("图像获取完成", "确认保存此人脸数据？"):
             inputWindow = tk.Toplevel(self.window)
             inputWindow.geometry("400x160")

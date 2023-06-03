@@ -3,8 +3,6 @@ import dlib
 import numpy as np
 from imutils import face_utils
 
-from Final.Core import FaceRecognition
-
 """
 思路：
     第一步：2D人脸关键点检测；第二步：3D人脸模型匹配；
