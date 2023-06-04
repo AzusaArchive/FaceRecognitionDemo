@@ -1,15 +1,14 @@
-
 class Status:
-    Init = 0
-    Normal = 1
-    EyeClosed = 2
-    MouseOpened = 3
-    HeadDown = 4
-    Offline = 5
-    Asleep = 6
+    Init = 0  # 初始化，处在该状态不应当被显示在线
+    Normal = 1  # 正常
+    EyeClosed = 2  # 闭眼
+    MouseOpened = 3  # 张嘴
+    HeadDown = 4  # 低头
+    Offline = 5  # 离线
+    Asleep = 6  # 睡觉
 
     @staticmethod
-    def ToString(statusEnum:int) -> str:
+    def ToString(statusEnum: int) -> str:
         if statusEnum == 0:
             return ""
         elif statusEnum == 1:
@@ -28,7 +27,7 @@ class Status:
             raise "查无此状态"
 
     @staticmethod
-    def ToStringSChinese(statusEnum:int) -> str:
+    def ToStringSChinese(statusEnum: int) -> str:
         if statusEnum == 0:
             return ""
         elif statusEnum == 1:
@@ -45,4 +44,3 @@ class Status:
             return "睡觉"
         else:
             raise "查无此状态"
-

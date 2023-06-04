@@ -15,20 +15,20 @@ def Log(*obj: Any):
 
 class DetectionInfo:
     def __init__(self, userName: str):
-        self.__userName: str = userName
-        self.__onlineTime: timedelta = timedelta()
-        self.__status: int = Status.Init
-        self.__eyeBlinkTimes: int = 0
+        self.__userName: str = userName  # 用户名
+        self.__onlineTime: timedelta = timedelta()  # 在线时间
+        self.__status: int = Status.Init  # 当前状态
+        self.__eyeBlinkTimes: int = 0  # 眨眼次数
         self.__lastTimeInCamera: datetime = datetime.now()  # 每次检测必须更新此值
-        self.__notInCamera: bool = False
-        self.__eyeClosed: bool = False
-        self.__eyeCloseTime: float = 0
-        self.__asleepTimeThreshold: float = 3
+        self.__notInCamera: bool = False  # 当时是否在相机/视频中
+        self.__eyeClosed: bool = False  # 是否闭眼
+        self.__eyeCloseTime: float = 0  # 连续闭眼的时间
+        self.__asleepTimeThreshold: float = 3  # 连续闭眼被判定为睡觉的时间阈值
         self.__initCheckCount: int = 0  # 初始化检查次数
         self.__initCheckCountThreshold = 15  # 完成初始化所需要的检查次数
         self.__shouldDisplay: bool = False  # 在Init状态时为false，其余状态为true
-        self.__mouseOpened: bool = False
-        self.__headDown: bool = False
+        self.__mouseOpened: bool = False  # 是否张嘴
+        self.__headDown: bool = False  # 是否低头
         self.__statusAnalysisFrequency = 20  # 状态检测频率
 
         self.task_stateAnalysis: Optional[Task] = None
@@ -231,32 +231,32 @@ class DetectionInfo:
             time = datetime.now()
 
             # 简易FSM，通过状态切换来实现较为规范的检测，缺点是同一时间只能处在一个状态
-            if self.__status == Status.Normal:
-                offlineCheck()
-                mouseOpenCheck()
-                eyeCloseCheck()
-                headDownCheck()
+            if self.__status == Status.Normal:  # 正常状态
+                offlineCheck()  # 离线检测
+                mouseOpenCheck()  # 张嘴检测
+                eyeCloseCheck()  # 闭眼检测
+                headDownCheck()  # 低头检测
 
-            elif self.__status == Status.EyeClosed:
-                offlineCheck()
-                eyeOpenCheck()
-                mouseOpenCheck()
-                asleepCheck()
+            elif self.__status == Status.EyeClosed:  # 闭眼状态
+                offlineCheck()  # 离线检测
+                eyeOpenCheck()  # 睁眼检测
+                mouseOpenCheck()  # 张嘴检测
+                asleepCheck()  # 睡觉检测
 
-            elif self.__status == Status.MouseOpened:
-                offlineCheck()
-                headDownCheck()
-                mouseCloseCheck()
+            elif self.__status == Status.MouseOpened:  # 张嘴状态
+                offlineCheck()  # 离线检测
+                headDownCheck()  # 低头检测
+                mouseCloseCheck()  # 闭嘴检测
 
-            elif self.__status == Status.HeadDown:
-                offlineCheck()
-                headUpCheck()
+            elif self.__status == Status.HeadDown:  # 低头状态
+                offlineCheck()  # 离线检测
+                headUpCheck()  # 抬头检测
 
-            elif self.__status == Status.Asleep:
-                await wakeUpCheck()
+            elif self.__status == Status.Asleep:  # 睡觉状态
+                await wakeUpCheck()  # 清醒检测
 
-            elif self.__status == Status.Offline:
-                await onlineCheck()
+            elif self.__status == Status.Offline:  # 离线状态
+                await onlineCheck()  # 在线检测
 
             await asyncio.sleep(waitTime)  # 非精确计算，受CPU和协程切换影响
 

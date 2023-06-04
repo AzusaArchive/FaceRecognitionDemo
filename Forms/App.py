@@ -50,6 +50,7 @@ class App:
         self.InitNameTable()
 
         # 初始化参数控制区域
+        # 参数控制变量
         self.imageScaleVar = tk.DoubleVar(value=1)
         self.locatingModelVar = tk.IntVar(value=1)
         self.faceRecToleranceVar = tk.DoubleVar(value=0.45)
@@ -141,6 +142,7 @@ class App:
         self.task_updateNameBoard: Optional[Task] = None
         self.exitFlag = False
         self.window.protocol("WM_DELETE_WINDOW", self.ShutDown)
+
 
     def InitNameTable(self):
         self.nameTable = ttk.Treeview(self.nameBoard, columns=["#", "name", "status", "blink_times", "online_time"],
