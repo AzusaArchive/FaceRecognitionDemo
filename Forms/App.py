@@ -143,7 +143,6 @@ class App:
         self.exitFlag = False
         self.window.protocol("WM_DELETE_WINDOW", self.ShutDown)
 
-
     def InitNameTable(self):
         self.nameTable = ttk.Treeview(self.nameBoard, columns=["#", "name", "status", "blink_times", "online_time"],
                                       show="headings", style="black.Treeview", height=45)
@@ -204,10 +203,10 @@ class App:
         tk.Label(controlPanel, text="人脸定位模型：", bg="#1E1E1E", fg="#DDDDDD") \
             .grid(column=0, padx=12, sticky="nw")
         frame_locatingModel = tk.Frame(controlPanel, bg="#1E1E1E")
-        frame_locatingModel.grid(column=0, padx=12, pady=(0,24), sticky="nw")
-        tk.Radiobutton(frame_locatingModel, text="hog", bg="#1E1E1E", fg="#DDDDDD",selectcolor="#1E1E1E",
-                       value=0, variable=self.locatingModelVar,).pack(side="left", padx=12)
-        tk.Radiobutton(frame_locatingModel, text="cnn", bg="#1E1E1E", fg="#DDDDDD",selectcolor="#1E1E1E",
+        frame_locatingModel.grid(column=0, padx=12, pady=(0, 24), sticky="nw")
+        tk.Radiobutton(frame_locatingModel, text="hog", bg="#1E1E1E", fg="#DDDDDD", selectcolor="#1E1E1E",
+                       value=0, variable=self.locatingModelVar, ).pack(side="left", padx=12)
+        tk.Radiobutton(frame_locatingModel, text="cnn", bg="#1E1E1E", fg="#DDDDDD", selectcolor="#1E1E1E",
                        value=1, variable=self.locatingModelVar).pack(side="left", padx=12)
 
         slider_faceRecTolerance = tk.Scale(controlPanel, bg="#1E1E1E", fg="#DDDDDD",
@@ -317,21 +316,23 @@ class App:
         self.detectionData.clear()
 
         # 图像处理管线
-        async def processPipeline(waitTime: float):
+        async def processPipeline(waitTime: float) -> bool:
             ret, self.currentFrame = self.frameCapture.GetFrame(self.imageScaleVar.get())
             if not ret:
                 return False
-            self.RecognizeFaces()
-            self.GetLandmarks()
-            self.GetHeadPose()
+            self.RecognizeFaces()  # 人脸识别
+            self.GetLandmarks()  # 特征点识别
+            self.GetHeadPose()  # 头部姿态分析
 
-            self.UpdateDetectionData()
-            self.DetectExpression()
+            self.UpdateDetectionData()  # 更新检测数据
+            self.DetectExpression()  # 表情检测
 
             if self.drawHeadPose.get():
-                self.DrawHeadPose()
+                self.DrawHeadPose()  # 绘制头部矩形边界
             if self.drawFaceRectVar.get():
-                self.DrawDetectionData()
+                self.DrawDetectionData()  # 绘制人脸矩形框，人名以及当前状态
+            if self.drawLandmarkVar.get():
+                FaceRec.DrawLandmarks(self.currentFrame, self.landmarks)  # 绘制特征点
 
             self.UpdateFrame()
             await asyncio.sleep(waitTime)
@@ -419,15 +420,13 @@ class App:
         if self.currentFrame is not None:
             self.faceData = FaceRec.Recognize(self.currentFrame, FaceData.knownFaceName,
                                               FaceData.knownFaceEncoding, tolerance=self.faceRecToleranceVar.get(),
-                                              model=("hog","cnn")[self.locatingModelVar.get()])
+                                              model=("hog", "cnn")[self.locatingModelVar.get()])
         else:
             self.Log("No frame to recognize.")
 
     def GetLandmarks(self):
         locations = [location for name, location in self.faceData]
         self.landmarks = FaceRec.GetLandmarks(self.currentFrame, locations)
-        if self.drawLandmarkVar.get():
-            FaceRec.DrawLandmarks(self.currentFrame, self.landmarks)
 
     def GetHeadPose(self):
         self.headPoses = []
